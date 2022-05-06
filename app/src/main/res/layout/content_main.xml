@@ -25,14 +25,13 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="0dp" />
+        android:layout_marginTop="80dp" />
 
     <Button
         android:layout_width="150dp"
         android:layout_height="90dp"
         android:text="ON"
         android:id="@+id/btn_startstop"
-
         android:onClick="onStartStop"
         android:textSize="58dp"
         android:gravity="center_vertical|center_horizontal"
