@@ -107,8 +107,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onLocationChanged(Location location) {
             /* テスト用 */
-    //                location.setLatitude(35.71023);
-    //                location.setLongitude(139.797603);
+//                    location.setLatitude(35.71023);
+//                    location.setLongitude(139.797603);
 
                 if (_language.equals("ja")) {
                     mess_disp = " 緯度：" + location.getLatitude() + "\n 経度：" + location.getLongitude() + "\n\n";
@@ -415,35 +415,7 @@ public class MainActivity extends AppCompatActivity {
 
     //  ボタン：メール送信
     public void onImgMail(View view) {
-
-/*        if (gpsflag == false) {
-            AlertDialog.Builder ad = new AlertDialog.Builder(this);
-            ad.setTitle("位置情報が取得できません");
-            ad.setMessage("\n\n位置情報の設定が無効です\n\n位置情報の設定を確認して下さい\n\n");
-            ad.setPositiveButton("ＯＫ", null);
-            ad.show();
-            return;
-        }
-
-        if (mess_disp.isEmpty() == true) {
-            AlertDialog.Builder ad = new AlertDialog.Builder(this);
-            ad.setTitle("位置情報を取得しています");
-            ad.setMessage("\n\n位置情報を取得した後\n\n再度ボタンを操作して下さい\n\n");
-            ad.setPositiveButton("キャンセル", null);
-            ad.show();
-            return;
-        }
-        */
-//        this.mailSend();
-        String addr[] = new String[5];
-        addr[0] = mailaddr1;
-        addr[1] = mailaddr2;
-        addr[2] = mailaddr3;
-//        String[] addr = {"furu12080205@gmail.com","takasif2924@gmail.com"};
-        String text;
-        text = ""+mess_mail + "\n" + mailtext;
-
-        this.composeEmail(addr, mailtitle, text);
+        mailSend();
     }
 
     public void composeEmail(String[] addresses, String subject, String message) {
@@ -460,8 +432,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void mailSend() {
         /* 送信 */
-        Intent intent = new Intent(Intent.ACTION_SENDTO);
-        //宛先をセット
         String all_mailaddr[] = new String[5];
         String message = "";
         if (mailaddr1.isEmpty() == false) all_mailaddr[0] = "" + mailaddr1;
@@ -469,28 +439,9 @@ public class MainActivity extends AppCompatActivity {
         if (mailaddr3.isEmpty() == false) all_mailaddr[2] = "" + mailaddr3;
         if (mailaddr4.isEmpty() == false) all_mailaddr[3] = "" + mailaddr4;
         if (mailaddr5.isEmpty() == false) all_mailaddr[4] = "" + mailaddr5;
-        if (all_mailaddr[0].isEmpty() == true) all_mailaddr[0] = "@gmail.com";
         message = "" + mess_mail + "\n" + mailtext;
         composeEmail(all_mailaddr, mailtitle, message);
     }
-
-    /*
-    public void end_func() {
-        String dtitle = "";
-
-        new AlertDialog.Builder(this)
-                .setTitle("title")
-                .setMessage("message")
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // OK button pressed
-                        finish();
-                    }
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
-    }*/
 
     //  戻るボタン
     @Override
