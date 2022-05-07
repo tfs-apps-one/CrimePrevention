@@ -28,6 +28,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 import com.google.android.gms.ads.AdView;
@@ -51,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
             };
-    private Intent intent;
+//    static public Intent intent;
     //  設定
     private boolean auto_alarm_flag;
     private boolean alarm_stop_flag;
@@ -431,31 +434,45 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         */
-        this.mailSend();
+//        this.mailSend();
+        String addr[] = new String[5];
+        addr[0] = mailaddr1;
+        addr[1] = mailaddr2;
+        addr[2] = mailaddr3;
+//        String[] addr = {"furu12080205@gmail.com","takasif2924@gmail.com"};
+        String text;
+        text = ""+mess_mail + "\n" + mailtext;
+
+        this.composeEmail(addr, mailtitle, text);
+    }
+
+    public void composeEmail(String[] addresses, String subject, String message) {
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:"));
+        intent.putExtra(Intent.EXTRA_EMAIL, addresses);
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        intent.putExtra(Intent.EXTRA_TEXT, message);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
     }
 
     public void mailSend() {
         /* 送信 */
-        intent = new Intent();
-        intent.setAction(Intent.ACTION_SENDTO);
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
         //宛先をセット
-//        intent.setData(Uri.parse("mailto:takasif2924@gmail.com"));
-        String all_mailaddr = "";
-        if (mailaddr1.isEmpty() == false) all_mailaddr = mailaddr1;
-        if (mailaddr2.isEmpty() == false) all_mailaddr = all_mailaddr + "," + mailaddr2;
-        if (mailaddr3.isEmpty() == false) all_mailaddr = all_mailaddr + "," + mailaddr3;
-        if (mailaddr4.isEmpty() == false) all_mailaddr = all_mailaddr + "," + mailaddr4;
-        if (mailaddr5.isEmpty() == false) all_mailaddr = all_mailaddr + "," + mailaddr5;
-        if (all_mailaddr.isEmpty() == true) all_mailaddr = "@gmail.com";
-        intent.setData(Uri.parse("mailto:" + all_mailaddr));
-        //標題をセット
-        intent.putExtra(Intent.EXTRA_SUBJECT, mailtitle);
-        //本文をセット
-        intent.putExtra(Intent.EXTRA_TEXT, mess_mail + "\n" + mailtext);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        // メール起動
-        startActivity(intent);
-        }
+        String all_mailaddr[] = new String[5];
+        String message = "";
+        if (mailaddr1.isEmpty() == false) all_mailaddr[0] = "" + mailaddr1;
+        if (mailaddr2.isEmpty() == false) all_mailaddr[1] = "" + mailaddr2;
+        if (mailaddr3.isEmpty() == false) all_mailaddr[2] = "" + mailaddr3;
+        if (mailaddr4.isEmpty() == false) all_mailaddr[3] = "" + mailaddr4;
+        if (mailaddr5.isEmpty() == false) all_mailaddr[4] = "" + mailaddr5;
+        if (all_mailaddr[0].isEmpty() == true) all_mailaddr[0] = "@gmail.com";
+        message = "" + mess_mail + "\n" + mailtext;
+        composeEmail(all_mailaddr, mailtitle, message);
+    }
 
     /*
     public void end_func() {
