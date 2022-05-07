@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="security.alarm">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <application
         android:allowBackup="true"
@@ -10,6 +12,11 @@
         android:roundIcon="@drawable/sa_96x96"
         android:supportsRtl="true"
         android:theme="@style/Theme.CrimePrevention">
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-4924620089567925~7991040095" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

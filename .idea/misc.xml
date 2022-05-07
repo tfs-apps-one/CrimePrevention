@@ -3,6 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/bak_emer.xml" value="0.29384615384615387" />
+        <entry key="app/src/main/res/drawable/bak_flat.xml" value="0.29384615384615387" />
+        <entry key="app/src/main/res/drawable/bak_grad.xml" value="0.29384615384615387" />
+        <entry key="app/src/main/res/drawable/btn_grad.xml" value="0.29384615384615387" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.22192028985507245" />
         <entry key="app/src/main/res/layout/content_main.xml" value="0.22192028985507245" />
         <entry key="app/src/main/res/xml/preferences.xml" value="0.21603260869565216" />

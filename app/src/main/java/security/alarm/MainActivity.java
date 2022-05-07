@@ -30,6 +30,10 @@ import android.widget.Toolbar;
 
 import java.util.Locale;
 
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.AdRequest;
+
+
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_LOCATION = 1;
     private int startflag = 0;
@@ -64,6 +68,9 @@ public class MainActivity extends AppCompatActivity {
     private String _language;
     private String _country;
 
+    // 広告
+    private AdView mAdview;
+
     //  アプリ生成時の処理
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,65 +85,67 @@ public class MainActivity extends AppCompatActivity {
         //　効果音
         bgm = MediaPlayer.create(this, R.raw.alarm);
 
-        // 広告
-        //AdView mAdView = (AdView) findViewById(R.id.adView);
-        //AdRequest adRequest = new AdRequest.Builder().build();
-        //mAdView.loadAd(adRequest);
+        //広告
+        mAdview = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdview.loadAd(adRequest);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-        Log.v("LifeCycle", "------------------------------>PERMISSION 1");
+            Log.v("LifeCycle", "------------------------------>PERMISSION 1");
 
-        // Check Permissions Now
-        mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-//            gpsflag = true;
-//            gpsflag = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        gpsflag = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            // Check Permissions Now
+            mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+    //            gpsflag = true;
+    //            gpsflag = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            gpsflag = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
-//        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 50, new LocationListener() {
-        @Override
-        public void onLocationChanged(Location location) {
-        /* テスト用 */
-//                location.setLatitude(35.71023);
-//                location.setLongitude(139.797603);
+    //        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, 1, new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+            /* テスト用 */
+    //                location.setLatitude(35.71023);
+    //                location.setLongitude(139.797603);
 
-            if (_language.equals("ja")) {
-                mess_disp = "緯度：" + location.getLatitude() + "\n経度：" + location.getLongitude() + "\n\n";
-                mess_mail = "現在の緯度,経度\n" + "http://maps.apple.com/?q=" + location.getLatitude() + "," + location.getLongitude();
-            } else if (_language.equals("zh")) {
-                mess_disp = "纬度:" + location.getLatitude() + "\n经度　:" + location.getLongitude() + "\n\n";
-                mess_mail = "当前的纬度，经度\n" + "http://maps.apple.com/?q=" + location.getLatitude() + "," + location.getLongitude();
-            } else if (_language.equals("es")) {
-                mess_disp = "latitud:" + location.getLatitude() + "\nlongitud:" + location.getLongitude() + "\n\n";
-                mess_mail = "latitud,longitud\n" + "http://maps.apple.com/?q=" + location.getLatitude() + "," + location.getLongitude();
-            } else if (_language.equals("pt")) {
-                mess_disp = "latitude:" + location.getLatitude() + "\nlongitude:" + location.getLongitude() + "\n\n";
-                mess_mail = "latitude,longitude\n" + "http://maps.apple.com/?q=" + location.getLatitude() + "," + location.getLongitude();
-            } else {
-                mess_disp = "latitude:" + location.getLatitude() + "\nlongitude:" + location.getLongitude() + "\n\n";
-                mess_mail = "Current latitude,longitude\n" + "http://maps.apple.com/?q=" + location.getLatitude() + "," + location.getLongitude();
+                if (_language.equals("ja")) {
+                    mess_disp = " 緯度：" + location.getLatitude() + "\n 経度：" + location.getLongitude() + "\n\n";
+                    mess_mail = "現在の緯度,経度\n" + "http://maps.apple.com/?q=" + location.getLatitude() + "," + location.getLongitude();
+                } else if (_language.equals("zh")) {
+                    mess_disp = " 纬度:" + location.getLatitude() + "\n 经度　:" + location.getLongitude() + "\n\n";
+                    mess_mail = "当前的纬度，经度\n" + "http://maps.apple.com/?q=" + location.getLatitude() + "," + location.getLongitude();
+                } else if (_language.equals("es")) {
+                    mess_disp = " latitud:" + location.getLatitude() + "\n longitud:" + location.getLongitude() + "\n\n";
+                    mess_mail = "latitud,longitud\n" + "http://maps.apple.com/?q=" + location.getLatitude() + "," + location.getLongitude();
+                } else if (_language.equals("pt")) {
+                    mess_disp = " latitude:" + location.getLatitude() + "\n longitude:" + location.getLongitude() + "\n\n";
+                    mess_mail = "latitude,longitude\n" + "http://maps.apple.com/?q=" + location.getLatitude() + "," + location.getLongitude();
+                } else {
+                    mess_disp = " latitude:" + location.getLatitude() + "\n longitude:" + location.getLongitude() + "\n\n";
+                    mess_mail = "Current latitude,longitude\n" + "http://maps.apple.com/?q=" + location.getLatitude() + "," + location.getLongitude();
+                }
+                Log.d("GPS", mess_disp);
+                mLocationManager.removeUpdates(this);
+
+                TextView v = (TextView) findViewById(R.id.textView);
+                v.setText(mess_disp);
+                v.setTextColor(Color.WHITE);
+                v.setBackgroundTintList(null);
+                v.setBackgroundResource(R.drawable.bak_flat);
+    //            v.setBackgroundColor(Color.BLACK);
             }
-            Log.d("GPS", mess_disp);
-            mLocationManager.removeUpdates(this);
 
-            TextView v = (TextView) findViewById(R.id.textView);
-            v.setText(mess_disp);
-            v.setTextColor(Color.WHITE);
-            v.setBackgroundColor(Color.BLACK);
-        }
+            @Override
+            public void onProviderDisabled(String provider) {
+            }
 
-        @Override
-        public void onProviderDisabled(String provider) {
-        }
+            @Override
+            public void onProviderEnabled(String provider) {
+            }
 
-        @Override
-        public void onProviderEnabled(String provider) {
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-        }
-        });
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
+            });
 
         }
         else {
@@ -147,8 +156,8 @@ public class MainActivity extends AppCompatActivity {
 
             AlertDialog.Builder ad = new AlertDialog.Builder(this);
             if (_language.equals("ja")) {
-                ad.setTitle("現在位置の取得について");
-                ad.setMessage("\n\n\n位置情報の取得を許可した場合、次回起動時より現在位置の取得が可能です\n\n\n\n");
+                ad.setTitle(" 現在位置の取得について");
+                ad.setMessage("\n\n\n 位置情報の取得を許可した場合、次回起動時より現在位置の取得が可能です\n\n\n\n");
                 ad.setPositiveButton("ＯＫ", null);
             } else if (_language.equals("zh")) {
                 ad.setTitle("对于收购的当前位置");
@@ -203,10 +212,8 @@ public class MainActivity extends AppCompatActivity {
 //        Toast.makeText(this, str+"現在"+ringVolume+"最大"+ringMaxVolume, Toast.LENGTH_SHORT).show();
 
         //  アラーム種類が変更？
-        if (bgm_name != bgm_str)
-        {
-            if (bgm.isPlaying() == true)
-            {
+        if (bgm_name != bgm_str) {
+            if (bgm.isPlaying() == true) {
                 bgm.stop();
                 bgm = null;
                 startflag = 0;
@@ -229,13 +236,12 @@ public class MainActivity extends AppCompatActivity {
             }
         } else {
             if (bgm.isPlaying() == false) {
-            bgm.setLooping(true);
-            bgm.start();
-        }
-        startflag = 1;
-        stopcount = 0;
-
-        btnStopDisp();
+                bgm.setLooping(true);
+                bgm.start();
+            }
+            startflag = 1;
+            stopcount = 0;
+            btnStopDisp();
         }
         //  アラーム停止制御
         if (alarm_stop_flag == false) stopmax = 1;
@@ -249,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
             if (gpsflag == false) {
                 TextView v = (TextView) findViewById(R.id.textView);
                 if (_language.equals("ja")) {
-                    v.setText("現在地の取得ができません\n位置情報の設定を確認して下さい");
+                    v.setText(" 現在地の取得ができません\n 位置情報の設定を確認して下さい");
                 } else if (_language.equals("zh")) {
                     v.setText("你不能得到您的位置\n检查的位置信息的设定");
                 } else if (_language.equals("es")) {
@@ -268,7 +274,7 @@ public class MainActivity extends AppCompatActivity {
             else {
                 TextView v = (TextView) findViewById(R.id.textView);
                 if (_language.equals("ja")) {
-                    v.setText("現在地を取得しています\nしばらくお待ち下さい．．．");
+                    v.setText(" 現在地を取得しています\n しばらくお待ち下さい．．．");
                 } else if (_language.equals("zh")) {
                     v.setText("你必须得到当前位置\n请稍等片刻 ...");
                 } else if (_language.equals("es")) {
@@ -292,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
         startflag = 0;
         if (startflag == 0) {
             btnStartDisp();
-            }
+        }
     }
 
     //  アラーム開始と停止処理（ボタン押下処理）
@@ -355,8 +361,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void btnStartDisp() {
         Button btn1 = (Button) findViewById(R.id.btn_startstop);
-            btn1.setBackgroundResource(R.drawable.btn_grad);
-            btn1.setTextColor(Color.parseColor("white"));
+        btn1.setBackgroundTintList(null);
+        btn1.setBackgroundResource(R.drawable.bak_emer);
+        btn1.setTextColor(Color.parseColor("white"));
+
         if (_language.equals("es")) {
             btn1.setText("COMIENZO");
             btn1.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 48);
@@ -369,13 +377,19 @@ public class MainActivity extends AppCompatActivity {
 
         ImageButton imgbtn1 = (ImageButton) findViewById(R.id.btn_img_speaker);
         imgbtn1.setImageResource(R.drawable.speaker_0);
-        imgbtn1.setBackgroundColor(Color.rgb(200, 200, 200));
+        imgbtn1.setBackgroundTintList(null);
+        imgbtn1.setBackgroundResource(R.drawable.bak_grad);
+
+        ImageButton imgbtn2 = (ImageButton) findViewById(R.id.btn_img_mail);
+        imgbtn2.setBackgroundTintList(null);
     }
 
     private void btnStopDisp() {
         Button btn1 = (Button) findViewById(R.id.btn_startstop);
-        btn1.setBackgroundColor(Color.parseColor("white"));
+        btn1.setBackgroundTintList(null);
+        btn1.setBackgroundResource(R.drawable.bak_grad);
         btn1.setTextColor(Color.parseColor("red"));
+
         if (_language.equals("es")) {
             btn1.setText("DETENER");
             btn1.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 48);
@@ -388,7 +402,11 @@ public class MainActivity extends AppCompatActivity {
 
         ImageButton imgbtn1 = (ImageButton) findViewById(R.id.btn_img_speaker);
         imgbtn1.setImageResource(R.drawable.speaker_1);
-        imgbtn1.setBackgroundColor(Color.rgb(255, 0, 0));
+        imgbtn1.setBackgroundTintList(null);
+        imgbtn1.setBackgroundResource(R.drawable.bak_emer);
+
+        ImageButton imgbtn2 = (ImageButton) findViewById(R.id.btn_img_mail);
+        imgbtn2.setBackgroundTintList(null);
     }
 
 
@@ -555,6 +573,9 @@ public class MainActivity extends AppCompatActivity {
         if (bgm.isPlaying() == true) {
             bgm.stop();
             bgm = null;
+        }
+        if (mLocationManager != null){
+            mLocationManager = null;
         }
     }
 
