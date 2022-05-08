@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">安防报警</string>
     <string name="action_settings">环境</string>
+    <string name="btn_tips">TIPS</string>
 
     <string name="preference_title">设置项目</string>
 

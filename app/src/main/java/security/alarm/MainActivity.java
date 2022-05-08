@@ -369,6 +369,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //  ボタン：TIPS
+    public void onTips(View view) {
+
+    }
+
     //  ボタン：効果音スタート＆ストップ
     public void onStartStop(View view) {
         this.alarm_start_stop();
@@ -402,6 +407,11 @@ public class MainActivity extends AppCompatActivity {
 
         ImageButton imgbtn2 = (ImageButton) findViewById(R.id.btn_img_mail);
         imgbtn2.setBackgroundTintList(null);
+
+        Button btn2 = (Button) findViewById(R.id.btn_tips);
+        btn2.setBackgroundTintList(null);
+        btn2.setBackgroundResource(R.drawable.btn_grad2);
+        btn2.setTextColor(Color.parseColor("gray"));
     }
 
     private void btnStopDisp() {
@@ -427,6 +437,12 @@ public class MainActivity extends AppCompatActivity {
 
         ImageButton imgbtn2 = (ImageButton) findViewById(R.id.btn_img_mail);
         imgbtn2.setBackgroundTintList(null);
+
+        Button btn2 = (Button) findViewById(R.id.btn_tips);
+        btn2.setBackgroundTintList(null);
+        btn2.setBackgroundResource(R.drawable.btn_grad2);
+        btn2.setTextColor(Color.parseColor("gray"));
+
     }
 
 

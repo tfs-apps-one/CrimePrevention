@@ -72,8 +72,9 @@
             android:text="ON"
             android:textSize="58dp" />
 
-        <ImageButton
-            android:id="@+id/btn_img_mail"
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_below="@+id/btn_startstop"
@@ -83,9 +84,33 @@
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="0dp"
             android:layout_weight="1"
-            android:onClick="onImgMail"
-            android:src="@raw/mailicon"
-            tools:ignore="SpeakableTextPresentCheck" />
+            android:orientation="horizontal">
+
+
+            <Button
+                android:id="@+id/btn_tips"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/cardview_shadow_start_color"
+                android:onClick="onTips"
+                android:text="@string/btn_tips"
+                android:textColor="@color/teal_700"
+                android:textStyle="bold"
+                android:textSize="20dp"
+                tools:ignore="TouchTargetSizeCheck" />
+
+            <ImageButton
+                android:id="@+id/btn_img_mail"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="3"
+                android:layout_marginStart="40dp"
+                android:onClick="onImgMail"
+                android:src="@raw/mailicon"
+                tools:ignore="SpeakableTextPresentCheck" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

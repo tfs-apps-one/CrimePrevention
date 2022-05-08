@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Security alarm</string>
     <string name="action_settings">Settings</string>
+    <string name="btn_tips">TIPS</string>
 
     <string name="preference_title">Setting items</string>
 
