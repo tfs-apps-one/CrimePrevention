@@ -4,10 +4,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -59,13 +63,13 @@ public class MainActivity extends AppCompatActivity {
     private boolean auto_alarm_flag;
     private boolean alarm_stop_flag;
     private int alarm_volume;
-    private String mailaddr1;
-    private String mailaddr2;
-    private String mailaddr3;
-    private String mailaddr4;
-    private String mailaddr5;
-    private String mailtitle;
-    private String mailtext;
+    private String mailaddr1 = "";
+    private String mailaddr2 = "";
+    private String mailaddr3 = "";
+    private String mailaddr4 = "";
+    private String mailaddr5 = "";
+    private String mailtitle = "";
+    private String mailtext = "";
     //  国設定
     private Locale _local;
     private String _language;
@@ -73,6 +77,14 @@ public class MainActivity extends AppCompatActivity {
 
     // 広告
     private AdView mAdview;
+
+    //  DB関連
+    public MyOpenHelper helper;         //DBアクセス
+    private int db_isopen = 0;          //DB使用したか
+    private int db_level = 0;           //DBユーザーレベル
+    private int db_data1 = 0;           //DB予備データ
+    private int db_data2 = 0;           //DB
+    private int db_data3 = 0;           //DB
 
     //  アプリ生成時の処理
     @Override
@@ -190,6 +202,11 @@ public class MainActivity extends AppCompatActivity {
 
         //  国設定
 //        _local = Resources().getSystem().getConfiguration().locale;
+
+        //DBのロード
+        /* データベース */
+        helper = new MyOpenHelper(this);
+        AppDBInitRoad();
 
         //  設定関連
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -519,6 +536,8 @@ public class MainActivity extends AppCompatActivity {
     public void onPause() {
         super.onPause();
         Log.v("LifeCycle", "------------------------------>onPause");
+        //  DB更新
+        AppDBUpdated();
     }
 
     @Override
@@ -531,12 +550,17 @@ public class MainActivity extends AppCompatActivity {
     public void onStop() {
         super.onStop();// ATTENTION: This was auto-generated to implement the App Indexing API.
         Log.v("LifeCycle", "------------------------------>onStop");
+        //  DB更新
+        AppDBUpdated();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         Log.v("LifeCycle", "------------------------------>onDestroy");
+
+        //  DB更新
+        AppDBUpdated();
 
         if (bgm.isPlaying() == true) {
             bgm.stop();
@@ -546,5 +570,102 @@ public class MainActivity extends AppCompatActivity {
             mLocationManager = null;
         }
     }
+
+    /**
+     * DB関連処理
+     */
+
+    /***************************************************
+        DB初期ロードおよび設定
+    ****************************************************/
+    public void AppDBInitRoad() {
+        SQLiteDatabase db = helper.getReadableDatabase();
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT");
+        sql.append(" isopen");
+        sql.append(" ,level");
+        sql.append(" ,data1");
+        sql.append(" ,data2");
+        sql.append(" ,data3");
+        sql.append(" FROM appinfo;");
+        try {
+            Cursor cursor = db.rawQuery(sql.toString(), null);
+            //TextViewに表示
+            StringBuilder text = new StringBuilder();
+            if (cursor.moveToNext()) {
+                db_isopen = cursor.getInt(0);
+                db_level = cursor.getInt(1);
+                db_data1 = cursor.getInt(2);
+                db_data2 = cursor.getInt(3);
+                db_data3 = cursor.getInt(4);
+            }
+        } finally {
+            db.close();
+        }
+
+        db = helper.getWritableDatabase();
+        if (db_isopen == 0) {
+            long ret;
+            /* 新規レコード追加 */
+            ContentValues insertValues = new ContentValues();
+            insertValues.put("isopen", 1);
+            insertValues.put("level", 0);
+            insertValues.put("data1", 0);
+            insertValues.put("data2", 0);
+            insertValues.put("data3", 0);
+            insertValues.put("data4", 0);
+            insertValues.put("data5", 0);
+            insertValues.put("data6", 0);
+            insertValues.put("data7", 0);
+            insertValues.put("data8", 0);
+            insertValues.put("data9", 0);
+            insertValues.put("data10", 0);
+            try {
+                ret = db.insert("appinfo", null, insertValues);
+            } finally {
+                db.close();
+            }
+            db_isopen = 1;
+            db_level = 0;
+            /*
+            if (ret == -1) {
+                Toast.makeText(this, "DataBase Create.... ERROR", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "DataBase Create.... OK", Toast.LENGTH_SHORT).show();
+            }
+             */
+        } else {
+            /*
+            Toast.makeText(this, "Data Loading...  interval:" + db_interval, Toast.LENGTH_SHORT).show();
+             */
+        }
+    }
+
+    /***************************************************
+        DB更新
+    ****************************************************/
+    public void AppDBUpdated() {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        ContentValues insertValues = new ContentValues();
+        insertValues.put("isopen", db_isopen);
+        insertValues.put("level", db_level);
+        insertValues.put("data1", db_data1);
+        insertValues.put("data2", db_data2);
+        insertValues.put("data3", db_data3);
+        int ret;
+        try {
+            ret = db.update("appinfo", insertValues, null, null);
+        } finally {
+            db.close();
+        }
+        /*
+        if (ret == -1) {
+            Toast.makeText(this, "Saving.... ERROR ", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Saving.... OK "+ "op=0:"+db_isopen+" interval=1:"+db_interval+" brightness=2:"+db_brightness, Toast.LENGTH_SHORT).show();
+        }
+         */
+    }
+
 
 }
