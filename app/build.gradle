@@ -9,8 +9,8 @@ android {
         applicationId "security.alarm"
         minSdk 26
         targetSdk 32
-        versionCode 9
-        versionName "2.1"
+        versionCode 10
+        versionName "2.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -34,6 +34,5 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
     implementation 'androidx.navigation:navigation-fragment:2.2.2'
     implementation 'androidx.navigation:navigation-ui:2.2.2'
-    implementation 'com.google.firebase:firebase-ads:20.+'
-    implementation 'com.google.android.gms:play-services-ads-lite:20.6.0'
+    implementation 'com.google.android.gms:play-services-ads:20.6.0'
 }

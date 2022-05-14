@@ -2,6 +2,8 @@
 <resources>
     <string name="app_name">防犯アラーム</string>
     <string name="action_settings">設定</string>
+    <string name="btn_tips">TIPS</string>
+
 
     <string name="preference_title">設定項目</string>
 

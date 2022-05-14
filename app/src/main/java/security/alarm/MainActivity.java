@@ -1,13 +1,15 @@
 package security.alarm;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -26,18 +28,23 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toolbar;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
-import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.rewarded.RewardedAd;
+import java.util.Locale;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 
-
+//public class MainActivity extends AppCompatActivity {
 public class MainActivity extends AppCompatActivity {
+
     private static final int REQUEST_LOCATION = 1;
     private int startflag = 0;
     private int stopcount = -1;
@@ -59,13 +66,13 @@ public class MainActivity extends AppCompatActivity {
     private boolean auto_alarm_flag;
     private boolean alarm_stop_flag;
     private int alarm_volume;
-    private String mailaddr1;
-    private String mailaddr2;
-    private String mailaddr3;
-    private String mailaddr4;
-    private String mailaddr5;
-    private String mailtitle;
-    private String mailtext;
+    private String mailaddr1 = "";
+    private String mailaddr2 = "";
+    private String mailaddr3 = "";
+    private String mailaddr4 = "";
+    private String mailaddr5 = "";
+    private String mailtitle = "";
+    private String mailtext = "";
     //  国設定
     private Locale _local;
     private String _language;
@@ -73,6 +80,27 @@ public class MainActivity extends AppCompatActivity {
 
     // 広告
     private AdView mAdview;
+
+    //  DB関連
+    public MyOpenHelper helper;         //DBアクセス
+    private int db_isopen = 0;          //DB使用したか
+    private int db_level = 0;           //DBユーザーレベル
+    private int db_data1 = 0;           //DB予備データ
+    private int db_data2 = 0;           //DB
+    private int db_data3 = 0;           //DB
+
+    final int LV_MAX = 99;               //ユーザーレベルMAX
+
+    // リワード広告
+//    private RewardedVideoAd mRewardedVideoAd;
+    /*
+    // テストID
+    private static final String AD_UNIT_ID = "ca-app-pub-3940256099942544/5224354917";
+    // テストID(APPは本物でOK)
+    private static final String APP_ID = "ca-app-pub-4924620089567925~9620469063";
+     */
+//    private static final String AD_UNIT_ID = "ca-app-pub-4924620089567925/7856940532";
+//    private static final String APP_ID = "ca-app-pub-4924620089567925~9620469063";
 
     //  アプリ生成時の処理
     @Override
@@ -89,9 +117,54 @@ public class MainActivity extends AppCompatActivity {
         bgm = MediaPlayer.create(this, R.raw.alarm);
 
         //広告
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+
         mAdview = findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdview.loadAd(adRequest);
+        mAdview.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                // Code to be executed when an ad finishes loading.
+            }
+
+            @Override
+            public void onAdFailedToLoad(LoadAdError adError) {
+                // Code to be executed when an ad request fails.
+            }
+
+            @Override
+            public void onAdOpened() {
+                // Code to be executed when an ad opens an overlay that
+                // covers the screen.
+            }
+
+            @Override
+            public void onAdClicked() {
+                // Code to be executed when the user clicks on an ad.
+            }
+
+            @Override
+            public void onAdClosed() {
+                // Code to be executed when the user is about to return
+                // to the app after tapping on an ad.
+            }
+        });
+//        mAdview = findViewById(R.id.adView);
+//        AdRequest adRequest = new AdRequest.Builder().build();
+//        mAdview.loadAd(adRequest);
+
+        // リワード広告
+        /*
+        MobileAds.initialize(this, APP_ID);
+        mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
+        mRewardedVideoAd.setRewardedVideoAdListener(this);
+        loadRewardedVideoAd();
+        */
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Log.v("LifeCycle", "------------------------------>PERMISSION 1");
@@ -134,7 +207,6 @@ public class MainActivity extends AppCompatActivity {
                 v.setTextColor(Color.WHITE);
                 v.setBackgroundTintList(null);
                 v.setBackgroundResource(R.drawable.bak_flat);
-    //            v.setBackgroundColor(Color.BLACK);
             }
 
             @Override
@@ -181,6 +253,8 @@ public class MainActivity extends AppCompatActivity {
             }
             ad.show();
         }
+
+
     }
 
     @Override
@@ -190,6 +264,11 @@ public class MainActivity extends AppCompatActivity {
 
         //  国設定
 //        _local = Resources().getSystem().getConfiguration().locale;
+
+        //DBのロード
+        /* データベース */
+        helper = new MyOpenHelper(this);
+        AppDBInitRoad();
 
         //  設定関連
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -352,6 +431,86 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //  ボタン：TIPS
+    /* **************************************************
+        TIPS　ボタン処理
+    ****************************************************/
+    public void onTips(View view){
+        AlertDialog.Builder guide = new AlertDialog.Builder(this);
+        TextView vmessage = new TextView(this);
+        int level = 0;
+        String pop_message = "";
+        String btn_yes = "";
+        String btn_no = "";
+
+        if (bgm.isPlaying() == false) {
+
+            //ユーザーレベル算出
+            level = db_level;
+            level++;
+            if (level >= LV_MAX){
+                level = LV_MAX;
+            }
+
+            if (_language.equals("ja")) {
+
+                pop_message += "\n\n 動画を視聴してポイントをGETしますか？" +
+                        "\n\n（ポイントをGETするとアプリ機能が追加します）" +
+                        "\n　１回視聴：現在位置をメールに自動セット" +
+                        "\n　２回以上視聴：ポイントが増えます" +
+                        "\n 　現在のポイント「"+db_level+"」→「"+level+"」"+"\n \n\n\n";
+
+                btn_yes += "視聴";
+                btn_no += "中止";
+            }
+            else{
+                pop_message += "\n\n \n" +
+                        "Do you want to watch the video and get POINTS ?" +
+                        "\n\n\n App function will be added when you get POINTS." +
+                        "\nAutomatically set your current location to email."+
+                        "\n\n POINTS「"+db_level+"」→「"+level+"」"+"\n \n\n\n";
+
+                btn_yes += "YES";
+                btn_no += "N O";
+            }
+
+            //メッセージ
+            vmessage.setText(pop_message);
+            vmessage.setBackgroundColor(Color.DKGRAY);
+            vmessage.setTextColor(Color.WHITE);
+            //タイトル
+            guide.setTitle("TIPS");
+            guide.setIcon(R.drawable.present);
+            guide.setView(vmessage);
+
+            guide.setPositiveButton(btn_yes, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    /*
+                    if (mRewardedVideoAd.isLoaded()) {
+                        mRewardedVideoAd.show();
+                    }*/
+
+                    //test_make
+                    db_level++;
+                }
+            });
+            guide.setNegativeButton(btn_no, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    btnStartDisp();
+                }
+            });
+
+            guide.create();
+            guide.show();
+        }
+        else{
+
+        }
+    }
+
+
     //  ボタン：効果音スタート＆ストップ
     public void onStartStop(View view) {
         this.alarm_start_stop();
@@ -385,6 +544,13 @@ public class MainActivity extends AppCompatActivity {
 
         ImageButton imgbtn2 = (ImageButton) findViewById(R.id.btn_img_mail);
         imgbtn2.setBackgroundTintList(null);
+
+        /*
+        Button btn2 = (Button) findViewById(R.id.btn_tips);
+        btn2.setBackgroundTintList(null);
+        btn2.setBackgroundResource(R.drawable.btn_grad2);
+        btn2.setTextColor(Color.parseColor("gray"));
+         */
     }
 
     private void btnStopDisp() {
@@ -410,6 +576,14 @@ public class MainActivity extends AppCompatActivity {
 
         ImageButton imgbtn2 = (ImageButton) findViewById(R.id.btn_img_mail);
         imgbtn2.setBackgroundTintList(null);
+
+        /*
+        Button btn2 = (Button) findViewById(R.id.btn_tips);
+        btn2.setBackgroundTintList(null);
+        btn2.setBackgroundResource(R.drawable.btn_grad2);
+        btn2.setTextColor(Color.parseColor("gray"));
+         */
+
     }
 
 
@@ -519,6 +693,8 @@ public class MainActivity extends AppCompatActivity {
     public void onPause() {
         super.onPause();
         Log.v("LifeCycle", "------------------------------>onPause");
+        //  DB更新
+        AppDBUpdated();
     }
 
     @Override
@@ -531,12 +707,17 @@ public class MainActivity extends AppCompatActivity {
     public void onStop() {
         super.onStop();// ATTENTION: This was auto-generated to implement the App Indexing API.
         Log.v("LifeCycle", "------------------------------>onStop");
+        //  DB更新
+        AppDBUpdated();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         Log.v("LifeCycle", "------------------------------>onDestroy");
+
+        //  DB更新
+        AppDBUpdated();
 
         if (bgm.isPlaying() == true) {
             bgm.stop();
@@ -546,5 +727,102 @@ public class MainActivity extends AppCompatActivity {
             mLocationManager = null;
         }
     }
+
+    /**
+     * DB関連処理
+     */
+
+    /***************************************************
+        DB初期ロードおよび設定
+    ****************************************************/
+    public void AppDBInitRoad() {
+        SQLiteDatabase db = helper.getReadableDatabase();
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT");
+        sql.append(" isopen");
+        sql.append(" ,level");
+        sql.append(" ,data1");
+        sql.append(" ,data2");
+        sql.append(" ,data3");
+        sql.append(" FROM appinfo;");
+        try {
+            Cursor cursor = db.rawQuery(sql.toString(), null);
+            //TextViewに表示
+            StringBuilder text = new StringBuilder();
+            if (cursor.moveToNext()) {
+                db_isopen = cursor.getInt(0);
+                db_level = cursor.getInt(1);
+                db_data1 = cursor.getInt(2);
+                db_data2 = cursor.getInt(3);
+                db_data3 = cursor.getInt(4);
+            }
+        } finally {
+            db.close();
+        }
+
+        db = helper.getWritableDatabase();
+        if (db_isopen == 0) {
+            long ret;
+            /* 新規レコード追加 */
+            ContentValues insertValues = new ContentValues();
+            insertValues.put("isopen", 1);
+            insertValues.put("level", 0);
+            insertValues.put("data1", 0);
+            insertValues.put("data2", 0);
+            insertValues.put("data3", 0);
+            insertValues.put("data4", 0);
+            insertValues.put("data5", 0);
+            insertValues.put("data6", 0);
+            insertValues.put("data7", 0);
+            insertValues.put("data8", 0);
+            insertValues.put("data9", 0);
+            insertValues.put("data10", 0);
+            try {
+                ret = db.insert("appinfo", null, insertValues);
+            } finally {
+                db.close();
+            }
+            db_isopen = 1;
+            db_level = 0;
+            /*
+            if (ret == -1) {
+                Toast.makeText(this, "DataBase Create.... ERROR", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "DataBase Create.... OK", Toast.LENGTH_SHORT).show();
+            }
+             */
+        } else {
+            /*
+            Toast.makeText(this, "Data Loading...  interval:" + db_interval, Toast.LENGTH_SHORT).show();
+             */
+        }
+    }
+
+    /***************************************************
+        DB更新
+    ****************************************************/
+    public void AppDBUpdated() {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        ContentValues insertValues = new ContentValues();
+        insertValues.put("isopen", db_isopen);
+        insertValues.put("level", db_level);
+        insertValues.put("data1", db_data1);
+        insertValues.put("data2", db_data2);
+        insertValues.put("data3", db_data3);
+        int ret;
+        try {
+            ret = db.update("appinfo", insertValues, null, null);
+        } finally {
+            db.close();
+        }
+        /*
+        if (ret == -1) {
+            Toast.makeText(this, "Saving.... ERROR ", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Saving.... OK "+ "op=0:"+db_isopen+" interval=1:"+db_interval+" brightness=2:"+db_brightness, Toast.LENGTH_SHORT).show();
+        }
+         */
+    }
+
 
 }
