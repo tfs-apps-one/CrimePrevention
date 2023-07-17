@@ -106,7 +106,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="5"
-                android:layout_marginStart="40dp"
+                android:layout_marginStart="0dp"
                 android:onClick="onImgMail"
                 android:src="@raw/mailicon"
                 tools:ignore="SpeakableTextPresentCheck" />
