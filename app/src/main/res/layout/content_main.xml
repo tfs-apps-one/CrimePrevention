@@ -6,6 +6,7 @@
     android:id="@+id/content_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/btn_grad3"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="security.alarm.MainActivity"
     tools:showIn="@layout/activity_main">
@@ -13,14 +14,13 @@
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="480dp"
+        android:layout_height="400dp"
         android:layout_alignParentStart="true"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="5dp"
         android:orientation="vertical"
-        app:backgroundTint="@null"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
@@ -71,8 +71,24 @@
             android:onClick="onStartStop"
             android:text="ON"
             android:textSize="58dp" />
+    </LinearLayout>
 
+    <ImageButton
+            android:id="@+id/btn_img_mail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/linearLayout"
+            android:layout_marginTop="40dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_weight="1"
+            app:backgroundTint="@null"
+            android:onClick="onImgMail"
+            android:src="@raw/mailicon"
+            tools:ignore="SpeakableTextPresentCheck" />
 
+        <!--
         <LinearLayout
             android:id="@+id/linearLayout2"
             android:layout_width="match_parent"
@@ -83,10 +99,11 @@
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="0dp"
+            app:backgroundTint="@null"
             android:layout_weight="1"
             android:orientation="horizontal">
 
-<!--
+
             <Button
                 android:id="@+id/btn_tips"
                 android:layout_width="0dp"
@@ -100,20 +117,21 @@
                 android:textStyle="bold"
                 android:textSize="18dp"
                 tools:ignore="TouchTargetSizeCheck" />
--->
+
             <ImageButton
                 android:id="@+id/btn_img_mail"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_weight="5"
+                android:layout_weight="1"
+                app:backgroundTint="@null"
                 android:layout_marginStart="0dp"
                 android:onClick="onImgMail"
                 android:src="@raw/mailicon"
                 tools:ignore="SpeakableTextPresentCheck" />
 
         </LinearLayout>
+        -->
 
-    </LinearLayout>
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
