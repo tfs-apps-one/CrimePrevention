@@ -43,7 +43,7 @@ import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 
 //public class MainActivity extends AppCompatActivity {
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LocationListener {
 
     private static final int REQUEST_LOCATION = 1;
     private int startflag = 0;
@@ -136,57 +136,15 @@ public class MainActivity extends AppCompatActivity {
 
             // Check Permissions Now
             mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-    //            gpsflag = true;
-    //            gpsflag = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            //            gpsflag = true;
+            //            gpsflag = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
             gpsflag = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
-    //        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, 1, new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-            /* テスト用 */
-//                    location.setLatitude(35.71023);
-//                    location.setLongitude(139.797603);
-
-                if (_language.equals("ja")) {
-                    mess_disp = " 緯度：" + location.getLatitude() + "\n 経度：" + location.getLongitude() + "\n\n";
-                    mess_mail = "現在の緯度,経度\n" + "http://maps.apple.com/?q=" + location.getLatitude() + "," + location.getLongitude();
-                } else if (_language.equals("zh")) {
-                    mess_disp = " 纬度:" + location.getLatitude() + "\n 经度　:" + location.getLongitude() + "\n\n";
-                    mess_mail = "当前的纬度，经度\n" + "http://maps.apple.com/?q=" + location.getLatitude() + "," + location.getLongitude();
-                } else if (_language.equals("es")) {
-                    mess_disp = " latitud:" + location.getLatitude() + "\n longitud:" + location.getLongitude() + "\n\n";
-                    mess_mail = "latitud,longitud\n" + "http://maps.apple.com/?q=" + location.getLatitude() + "," + location.getLongitude();
-                } else if (_language.equals("pt")) {
-                    mess_disp = " latitude:" + location.getLatitude() + "\n longitude:" + location.getLongitude() + "\n\n";
-                    mess_mail = "latitude,longitude\n" + "http://maps.apple.com/?q=" + location.getLatitude() + "," + location.getLongitude();
-                } else {
-                    mess_disp = " latitude:" + location.getLatitude() + "\n longitude:" + location.getLongitude() + "\n\n";
-                    mess_mail = "Current latitude,longitude\n" + "http://maps.apple.com/?q=" + location.getLatitude() + "," + location.getLongitude();
-                }
-                Log.d("GPS", mess_disp);
-                mLocationManager.removeUpdates(this);
-
-                TextView v = (TextView) findViewById(R.id.textView);
-                v.setText(mess_disp);
-                v.setTextColor(Color.WHITE);
-                v.setBackgroundTintList(null);
-                v.setBackgroundResource(R.drawable.bak_flat);
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-            }
-            });
-
+            //        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
+            //         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, 1, new LocationListener() {
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, (LocationListener) this);
+            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 3, (LocationListener) this);
+            mLocationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 3000, 3, (LocationListener) this);
         }
         else {
             Log.v("LifeCycle", "------------------------------>PERMISSION 0");
@@ -218,8 +176,37 @@ public class MainActivity extends AppCompatActivity {
             }
             ad.show();
         }
+    }
 
+    @Override
+    public void onLocationChanged(Location location) {
+        /* テスト用 */
+//                    location.setLatitude(35.71023);
+//                    location.setLongitude(139.797603);
+        if (_language.equals("ja")) {
+            mess_disp = " 緯度：" + location.getLatitude() + "\n 経度：" + location.getLongitude() + "\n\n";
+            mess_mail = "現在の緯度,経度\n" + "http://maps.apple.com/?q=" + location.getLatitude() + "," + location.getLongitude();
+        } else if (_language.equals("zh")) {
+            mess_disp = " 纬度:" + location.getLatitude() + "\n 经度　:" + location.getLongitude() + "\n\n";
+            mess_mail = "当前的纬度，经度\n" + "http://maps.apple.com/?q=" + location.getLatitude() + "," + location.getLongitude();
+        } else if (_language.equals("es")) {
+            mess_disp = " latitud:" + location.getLatitude() + "\n longitud:" + location.getLongitude() + "\n\n";
+            mess_mail = "latitud,longitud\n" + "http://maps.apple.com/?q=" + location.getLatitude() + "," + location.getLongitude();
+        } else if (_language.equals("pt")) {
+            mess_disp = " latitude:" + location.getLatitude() + "\n longitude:" + location.getLongitude() + "\n\n";
+            mess_mail = "latitude,longitude\n" + "http://maps.apple.com/?q=" + location.getLatitude() + "," + location.getLongitude();
+        } else {
+            mess_disp = " latitude:" + location.getLatitude() + "\n longitude:" + location.getLongitude() + "\n\n";
+            mess_mail = "Current latitude,longitude\n" + "http://maps.apple.com/?q=" + location.getLatitude() + "," + location.getLongitude();
+        }
+        Log.d("GPS", mess_disp);
+        mLocationManager.removeUpdates(this);
 
+        TextView v = (TextView) findViewById(R.id.textView);
+        v.setText(mess_disp);
+        v.setTextColor(Color.WHITE);
+        v.setBackgroundTintList(null);
+        v.setBackgroundResource(R.drawable.bak_flat);
     }
 
     @Override
